@@ -1,0 +1,23 @@
+[
+  {
+    "id": "saludo_maniana",
+    "monologo": "Soy el marcianito",
+    "condiciones": [
+      { "tipo": "lluvia", "valor": true }
+    ],
+    "respuestas": [
+      {
+        "texto": "¿¿En serio??",
+        "consecuencia": { "tipo": "nada" }
+      },
+      {
+        "texto": "odio a los marcianos",
+        "consecuencia": { "tipo": "irA", "id": "odio_a_los_marcianos" }
+      }
+    ]
+  },
+  {
+    "id": "odio_a_los_marcianos",
+    "monologo": "YO TE ODIO A VOS"
+  }
+]

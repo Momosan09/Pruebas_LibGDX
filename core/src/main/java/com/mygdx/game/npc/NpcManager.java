@@ -2,24 +2,36 @@ package com.mygdx.game.npc;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.eventos.Listeners;
+import com.mygdx.game.charlas.DialogoManager;
+import com.mygdx.game.enumeradores.EstadosJugador;
+import com.mygdx.game.eventos.Listeners;
 import com.mygdx.game.jugador.Jugador;
-
+import com.mygdx.game.util.EstadoMundo;
+import com.mygdx.game.util.MundoConfig;
 import com.mygdx.game.util.Render;
 
 public class NpcManager {
 
-    private Npc npc1;
+	private EstadoMundo estadoM;
+    private Npc npc1,npc2;
 	private ArrayList<Npc> npcs;
+	private DialogoManager dM;
 	
-	public NpcManager() {
+	public NpcManager(EstadoMundo estadoM, DialogoManager dM) {
+		this.estadoM = estadoM;
+		this.dM = dM;
+		
 		npcs = new ArrayList<>();
 		
-		npc1 = new Npc("npc.png");
+		npc1 = new Npc(6,6,"npc.png",MundoConfig.bundle.get("dialogos.npc.npc1_todosLosDialogos"));
+		npc2 = new Npc(6,0,"npc.png",MundoConfig.bundle.get("dialogos.npc.npc2_todosLosDialogos"));
 		
 		agregarNpc(npc1);
+		agregarNpc(npc2);
 	}
 	
 	public void agregarNpc(Npc npc) {
@@ -59,13 +71,19 @@ public class NpcManager {
 	    }
 
 	    if (masCercano != null) {
-	    	Listeners.ejecutarInteraccion(jugador);
-	        masCercano.interactuar(jugador);
+	    	//Listeners.ejecutarInteraccion(masCercano);
+	    	dM.iniciar(masCercano);
+	        //masCercano.interactuar(jugador);
+	        MundoConfig.locutor = masCercano;
+	        MundoConfig.estadoJugador =EstadosJugador.DIALOGO;
+	        MundoConfig.acutualizarCharla = true;
+	        
+	    }else {
+	        MundoConfig.estadoJugador =EstadosJugador.JUGANDO;
+	        MundoConfig.acutualizarCharla = false;
+	        jugador.resetInteraccion();
 	    }
 
-	    jugador.resetInteraccion();
+	    //jugador.resetInteraccion();
 	}
-
-
-	
 }

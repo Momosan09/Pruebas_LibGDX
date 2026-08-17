@@ -1,0 +1,91 @@
+package com.mygdx.game.charlas;
+
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
+import com.mygdx.game.charlas.condiciones.CondicionHora;
+import com.mygdx.game.charlas.condiciones.CondicionLluvia;
+import com.mygdx.game.charlas.consecuencias.ConsecuenciaIniciarCharla;
+import com.mygdx.game.charlas.dto.CharlaDTO;
+import com.mygdx.game.charlas.dto.CondicionDTO;
+import com.mygdx.game.charlas.dto.ConsecuenciaDTO;
+import com.mygdx.game.charlas.dto.RespuestaDTO;
+import com.badlogic.gdx.utils.Array;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.badlogic.gdx.Gdx;
+
+public class DialogoLoader {
+
+	public static List<Charla> cargar(String ruta) {
+
+	    Json json = new Json();
+
+	    Array<CharlaDTO> dtos = json.fromJson(Array.class, CharlaDTO.class, Gdx.files.internal(ruta));
+
+	    if (dtos == null) {
+	        throw new RuntimeException("No se pudieron cargar diálogos desde: " + ruta);
+	    }
+
+	    List<Charla> resultado = new ArrayList<>();
+
+	    for (CharlaDTO dto : dtos) {
+	        resultado.add(convertir(dto));
+	    }
+
+	    return resultado;
+	}
+
+
+    private static Charla convertir(CharlaDTO dto) {
+
+        List<Condicion> condiciones = new ArrayList<>();
+
+        if (dto.condiciones != null) {
+            for (CondicionDTO c : dto.condiciones) {
+                condiciones.add(crearCondicion(c));
+            }
+        }
+
+        List<Respuesta> respuestas = new ArrayList<>();
+
+        if (dto.respuestas != null) {
+            for (RespuestaDTO r : dto.respuestas) {
+                respuestas.add(
+                    new Respuesta(
+                        r.texto,
+                        crearConsecuencia(r.consecuencia)
+                    )
+                );
+            }
+        }
+
+        return new Charla(dto.id, dto.monologo, condiciones, respuestas);
+    }
+
+    private static Condicion crearCondicion(CondicionDTO dto) {
+        switch (dto.tipo) {
+            case "lluvia":
+                return new CondicionLluvia(dto.valor);
+            case "hora":
+                return new CondicionHora(dto.min, dto.max);
+            default:
+                throw new RuntimeException("Condición desconocida: " + dto.tipo);
+        }
+    }
+
+    private static Consecuencia crearConsecuencia(ConsecuenciaDTO dto) {
+
+        if (dto == null) return (mundo, npc) -> {};
+
+        switch (dto.tipo) {
+            case "irA":
+                return new ConsecuenciaIniciarCharla(dto.id);
+            case "nada":
+                return (mundo, npc) -> {};
+            default:
+                throw new RuntimeException("Consecuencia desconocida: " + dto.tipo);
+        }
+    }
+}

@@ -7,10 +7,15 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.mygdx.game.charlas.DialogoManager;
+import com.mygdx.game.enumeradores.EstadosJugador;
+import com.mygdx.game.hud.HUD;
 import com.mygdx.game.jugador.EntradasJugador;
 import com.mygdx.game.jugador.Jugador;
 import com.mygdx.game.npc.Npc;
 import com.mygdx.game.npc.NpcManager;
+import com.mygdx.game.util.EstadoMundo;
+import com.mygdx.game.util.MundoConfig;
 import com.mygdx.game.util.Render;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -22,10 +27,21 @@ public class Principal extends Game {
     private EntradasJugador entradasJugador;
     
     private NpcManager npcManager;
+    private DialogoManager dialogoManager;
+    
+    private EstadoMundo estadoM;
+    
+
 
     @Override
     public void create() {
-
+    	
+    	estadoM = new EstadoMundo(); 
+    	
+    	estadoM.setLloviendo(false);
+    	
+    	dialogoManager = new DialogoManager(estadoM);
+    	
         batch = new SpriteBatch();
         Render.batch = batch;
         Render.iniciarShapeDrawer();
@@ -33,10 +49,12 @@ public class Principal extends Game {
         jugador = new Jugador("personaje.png");
         entradasJugador = new EntradasJugador(jugador); 
 
-        npcManager = new NpcManager();
+        npcManager = new NpcManager(estadoM, dialogoManager);
 
         
     	Gdx.input.setInputProcessor(entradasJugador);
+    	
+
     }
 
     @Override
@@ -46,17 +64,27 @@ public class Principal extends Game {
         // --- UPDATE ---
         jugador.update();
         npcManager.resolverInteracciones(jugador);
+    	Gdx.input.setInputProcessor(entradasJugador);//TODO esto esta pesimo, pero es para el debug
+    	
 
         // --- DRAW ---
         Render.batch.begin();
         npcManager.dibujarNpcs();
         jugador.draw(Render.batch);
         Render.batch.end();
+        
+        if(MundoConfig.estadoJugador == EstadosJugador.DIALOGO) {
+        	Render.batch.begin();
+        	Gdx.input.setInputProcessor(dialogoManager.getStage());//TODO esto esta pesimo, pero es para el debug x2
+        	dialogoManager.dibujarHud();
+        	Render.batch.end();
+        }
     }
 
 
     @Override
     public void dispose() {
     	Render.batch.dispose();
+    	
     }
 }

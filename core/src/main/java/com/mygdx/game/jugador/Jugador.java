@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.enumeradores.EstadosJugador;
+import com.mygdx.game.util.MundoConfig;
 import com.mygdx.game.util.Render;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -79,6 +81,7 @@ public class Jugador {
 
 	public void resetInteraccion() {
 	    quiereInteractuar = false;
+	    MundoConfig.estadoJugador = EstadosJugador.JUGANDO;
 	}
 
 
