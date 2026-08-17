@@ -3,7 +3,9 @@ package com.mygdx.game.jugador;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.util.Render;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
@@ -13,13 +15,21 @@ public class Jugador {
 	private Texture textura;
 	private Sprite sprite;
 	private int velocidad = 100;
+	private float centroX;
+	private float centroY;
+	private int radioInteraccion = 2*64;
+	private boolean quiereInteractuar = false;
+	
+	private Circle areaInteraccion;
 	
 	public Jugador(String ruta) {
 		this.posicion = new Vector2(0,0);
 		this.textura = new Texture(ruta);
 		this.sprite = new Sprite(textura);
 		sprite.setPosition(posicion.x, posicion.y);
-		
+		centroX = posicion.x+textura.getWidth()/2;
+		centroY = posicion.y+textura.getHeight()/2;
+		areaInteraccion = new Circle(posicion, radioInteraccion);
 	}
 	
 
@@ -41,17 +51,36 @@ public class Jugador {
 	    }
 
 	    sprite.setPosition(posicion.x, posicion.y);
-	    
+		areaInteraccion.setPosition(posicion.x+textura.getWidth()/2, posicion.y+textura.getHeight()/2);
+		
 	}
 	
 	public void draw(SpriteBatch batch) {
 	    sprite.draw(batch);
-	    update();
+	    dibujarAreaDeInteraccion();
 	}
 	
-	protected void interactuar() {
-		System.out.println("hola");
+	private void dibujarAreaDeInteraccion() {
+		Render.drawer.circle(areaInteraccion.x, areaInteraccion.y, areaInteraccion.radius);
+		
 	}
+	
+	public Circle getAreaInteraccion() {
+	    return areaInteraccion;
+	}
+
+	public void solicitarInteraccion() {
+	    quiereInteractuar = true;
+	}
+
+	public boolean quiereInteractuar() {
+	    return quiereInteractuar;
+	}
+
+	public void resetInteraccion() {
+	    quiereInteractuar = false;
+	}
+
 
 
 	

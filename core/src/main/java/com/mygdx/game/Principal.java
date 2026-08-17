@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.jugador.EntradasJugador;
 import com.mygdx.game.jugador.Jugador;
+import com.mygdx.game.npc.Npc;
+import com.mygdx.game.npc.NpcManager;
 import com.mygdx.game.util.Render;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -18,14 +20,21 @@ public class Principal extends Game {
     
     private Jugador jugador;
     private EntradasJugador entradasJugador;
+    
+    private NpcManager npcManager;
 
     @Override
     public void create() {
 
         batch = new SpriteBatch();
         Render.batch = batch;
+        Render.iniciarShapeDrawer();
+        
         jugador = new Jugador("personaje.png");
-        entradasJugador = new EntradasJugador(jugador);
+        entradasJugador = new EntradasJugador(jugador); 
+
+        npcManager = new NpcManager();
+
         
     	Gdx.input.setInputProcessor(entradasJugador);
     }
@@ -33,10 +42,18 @@ public class Principal extends Game {
     @Override
     public void render() {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+
+        // --- UPDATE ---
+        jugador.update();
+        npcManager.resolverInteracciones(jugador);
+
+        // --- DRAW ---
         Render.batch.begin();
+        npcManager.dibujarNpcs();
         jugador.draw(Render.batch);
         Render.batch.end();
     }
+
 
     @Override
     public void dispose() {
